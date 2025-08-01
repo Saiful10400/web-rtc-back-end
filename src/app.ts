@@ -14,11 +14,11 @@ const httpServer=createServer(app)
 const io=new Server(httpServer,{
   cors: {
     origin: [
-      "http://localhost:5173",
+      "http://localhost:5173","http://192.168.1.20:5173",
     ],
     methods: ["GET", "POST"],
   },
-})
+}) 
 
 type Tuser={
   name:string,email:string,id:string
@@ -45,40 +45,73 @@ socket.on("get_active_user",()=>{
   })
 
 
-socket.on("Incoming_call_send",(data)=>{
-  const receiver=user.find(item=>item.email===data.receiver)
-  const sender=user.find(item=>item.email===data.sender)
-  if(receiver){
-    io.to(receiver.id).emit("Incoming_call_receive",{offer:data.offer,receiver,sender})
-  }
+
+  socket.on("offer",(e)=>{
+
+        const receiver=user.find(item=>item.email===e.to)
+      io.to(receiver.id).emit("offer-sv",e )
   })
 
-  //#negotiation.
-  socket.on("Incoming_call_send_negotiation",(data)=>{
-    const receiver=user.find(item=>item.email===data.receiver)
-    const sender=user.find(item=>item.email===data.sender)
-    if(receiver){
-      io.to(receiver.id).emit("Incoming_call_receive_negotiation",{offer:data.offer,receiver,sender})
-    }
-    })
+  socket.on("ans",(e)=>{
+
+    // sending answert to caller
+   const sender=user.find(item=>item.email===e.from)
+      io.to(sender.id).emit("ans-sv",e )
+  })
+
+
+socket.on("icecandidate",candidate=>{
+  console.log(candidate,"ice candidate")
+
+  // brodcasting this candidate to all users.
+  socket.broadcast.emit("icecandidate",candidate)
+})
+
+
+
+
+
+
+
+
+
+
+
+
+// socket.on("Incoming_call_send",(data)=>{
+//   const receiver=user.find(item=>item.email===data.receiver)
+//   const sender=user.find(item=>item.email===data.sender)
+//   if(receiver){
+//     io.to(receiver.id).emit("Incoming_call_receive",{offer:data.offer,receiver,sender})
+//   }
+//   })
+
+//   //#negotiation.
+//   socket.on("Incoming_call_send_negotiation",(data)=>{
+//     const receiver=user.find(item=>item.email===data.receiver)
+//     const sender=user.find(item=>item.email===data.sender)
+//     if(receiver){
+//       io.to(receiver.id).emit("Incoming_call_receive_negotiation",{offer:data.offer,receiver,sender})
+//     }
+//     })
 
 
 
   
-socket.on("call_accepted",(data)=>{
-  const sender=user.find(item=>item.email===data.sender)
-  if(sender){
-    io.to(sender.id).emit("Receiver_call_received",{answer:data.answer,receiver:data.receiver,sender})
-  }
-})
+// socket.on("call_accepted",(data)=>{
+//   const sender=user.find(item=>item.email===data.sender)
+//   if(sender){
+//     io.to(sender.id).emit("Receiver_call_received",{answer:data.answer,receiver:data.receiver,sender})
+//   }
+// })
 
-//# negotiation
-socket.on("call_accepted_negotiation",(data)=>{
-  const sender=user.find(item=>item.email===data.sender)
-  if(sender){
-    io.to(sender.id).emit("Receiver_call_received_negotiation",{answer:data.answer,receiver:data.receiver,sender})
-  }
-})
+// //# negotiation
+// socket.on("call_accepted_negotiation",(data)=>{
+//   const sender=user.find(item=>item.email===data.sender)
+//   if(sender){
+//     io.to(sender.id).emit("Receiver_call_received_negotiation",{answer:data.answer,receiver:data.receiver,sender})
+//   }
+// })
 
 
 

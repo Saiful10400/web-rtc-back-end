@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "ts-node-dev --respawn --transpile-only ./src/index.ts"
+    "start": "ts-node-dev --respawn --transpile-only ./src/app.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",
