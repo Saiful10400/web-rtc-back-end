@@ -12,7 +12,7 @@ const io = new Server(httpServer, {
   cors: {
     origin: [
       "http://localhost:5173",
-      "http://192.168.1.20:5173",
+      "https://videocall10400.vercel.app",
     ],
     methods: ["GET", "POST"],
   },
